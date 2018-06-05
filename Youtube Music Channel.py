@@ -7,7 +7,7 @@ from selenium import webdriver
 def downloadYoutube(listOfLinks, folder, minviews = 500000):
     ydl_opts = {
         'format': 'bestaudio/best',
-        'proxy': 'socks5://niwdle:Silverbullet19!@jfk-s01.vpn.asia:1080',
+        'proxy': '',
         'outtmpl': os.getcwd()+'/'+folder+'/%(title)s.%(ext)s',
         'download_archive': os.getcwd()+'/'+folder+'/downloaded.txt',
         'min_views': minviews,
