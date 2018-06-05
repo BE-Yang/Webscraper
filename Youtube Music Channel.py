@@ -4,12 +4,15 @@ import requests, pickle, os, youtube_dl
 import time, random
 from selenium import webdriver
 
-def downloadYoutube(listOfLinks):
+def downloadYoutube(listOfLinks, folder, minviews = 500000):
     ydl_opts = {
         'format': 'bestaudio/best',
         'proxy': 'socks5://niwdle:Silverbullet19!@jfk-s01.vpn.asia:1080',
-        'outtmpl': os.getcwd()+'/xKito Music - YouTube - YouTube/%(title)s.%(ext)s',
-        'download_archive': 'downloaded.txt',
+        'outtmpl': os.getcwd()+'/'+folder+'/%(title)s.%(ext)s',
+        'download_archive': os.getcwd()+'/'+folder+'/downloaded.txt',
+        'min_views': minviews,
+        'nooverwrites': True,
+        # 'skip_download': True,
         # 'username': 'Niwdle',
         # 'password': 'Silverbullet19!!',
         'postprocessors': [{
@@ -22,10 +25,10 @@ def downloadYoutube(listOfLinks):
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download(listOfLinks)
 
-def main():
+def main(channel):
 
-    youtubeurl = 'https://www.youtube.com/user/nyuualiaslucy/videos'
-
+    # youtubeurl = 'https://www.youtube.com/user/nyuualiaslucy/videos'
+    youtubeurl = channel
     # testpage = urllib.urlopen(youtubeurl).read()
     # print testpage
 
@@ -34,7 +37,7 @@ def main():
     session = webdriver.Firefox()
     session.get(youtubeurl)
 
-    numPages = 10
+    numPages = 78
     #scroll for x pages loop
     for x in range(1, numPages):
         positionOfPage = int(x)*1000
@@ -48,7 +51,7 @@ def main():
     print len(links)
 
 
-    if os._exists(os.getcwd()+'/'+session.title+'.pkl'):
+    if os.path.exists(os.getcwd()+'/'+session.title+'.pkl'):
         openFile = open(os.getcwd()+'/'+session.title+'.pkl', 'rb')
         linkTable = pickle.load(openFile)
         fileExists = True
@@ -69,9 +72,16 @@ def main():
     pickle.dump(linkTable, openFile)
     openFile.close()
 
-    if not os._exists(os.getcwd()+'/'+session.title+'/'):
+    if not os.path.exists(os.getcwd()+'/'+session.title+'/'):
+        print 'Creating directory' + os.getcwd()+'/'+session.title
         os.makedirs(os.getcwd()+'/'+session.title)
 
+def extractLinks(dictionary):
+    file = open(os.getcwd() + '\\' + dictionary, 'rb')
+    links = pickle.load(file)
+    file.close()
+    links = ['https://www.youtube.com' + y for x, y in links]
+    return links
 
 def testLinkTable(filename):
     openFile = open(os.getcwd() + '/' + filename, 'rb')
@@ -85,3 +95,4 @@ if __name__ == '__main__':
     # main()
     # testLinkTable('xKito Music - YouTube - YouTube.pkl')
     pass
+    # links = extractLinks('xKito Music - YouTube - YouTube.pkl')
