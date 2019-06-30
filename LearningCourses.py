@@ -12,7 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException
-import os, sys
+import os, sys, re
 from urllib2 import urlopen
 from math import floor
 from random import randint
@@ -33,7 +33,7 @@ def login(session):
 	session.find_element_by_id(LCConstants.PASS_ID).send_keys(LCConstants.PASS)
 	sleep(2)
 	session.find_element_by_id(LCConstants.PASS_ID).send_keys(Keys.ENTER)
-	WebDriverWait(session, 10).until(
+	WebDriverWait(session, 30).until(
 		EC.presence_of_element_located(
 			(By.PARTIAL_LINK_TEXT, LCConstants.SIGNIN_VERIFICATION)
 		)
@@ -118,9 +118,16 @@ def main(session, itemLink, folderPath):
 					)
 				)
 			except TimeoutException:
+				print '\n\n TimeOutException error \n\n'
 				session.quit()
 				session = startSession(LCConstants.LOGIN_PAGE)
 				login(session)
+				loadPageAndWait(session, LCConstants.ROOT_PAGE + link)
+				WebDriverWait(session, 10).until(
+					EC.presence_of_element_located(
+						(By.CLASS_NAME, LCConstants.VIDEO_CLASS)
+					)
+				)
 
 			sleep(5)
 			soup = bs(session.page_source, 'html.parser')
@@ -128,7 +135,7 @@ def main(session, itemLink, folderPath):
 			video = soup.find('video')['src']
 			summary = soup.find('div', class_= LCConstants.VIDEO_CLASS).text
 			downloadedVideo = urlopen(video)
-			fileName = str(item)+'-'+results[item]['title']
+			fileName = re.sub(r'/', '-', str(item)+'-'+results[item]['title'])
 			with open(fullFolderPath + '/' + fileName + '.mp4', 'wb') as f:
 				f.write(downloadedVideo.read())
 
