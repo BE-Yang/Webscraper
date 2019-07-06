@@ -135,7 +135,7 @@ def main(session, itemLink, folderPath):
 			video = soup.find('video')['src']
 			summary = soup.find('div', class_= LCConstants.VIDEO_CLASS).text
 			downloadedVideo = urlopen(video)
-			fileName = re.sub(r'/', '-', str(item)+'-'+results[item]['title'])
+			fileName = re.sub(r'[:"\\\/|<>*?]', '-', str(item)+'-'+results[item]['title'])
 			with open(fullFolderPath + '/' + fileName + '.mp4', 'wb') as f:
 				f.write(downloadedVideo.read())
 
@@ -160,6 +160,7 @@ if __name__ == '__main__':
 	login(session)
 	outputDirectory = LCConstants.OUTPUT_DIRECTORY
 	folderName = LCConstants.OUTPUT_FOLDER_NAME
+
 	folderPath = os.path.join(outputDirectory, folderName)
 
 	makeFolder(folderPath)
